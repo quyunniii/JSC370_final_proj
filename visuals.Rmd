@@ -1,6 +1,5 @@
 ---
-title: "JSC370 Final Project"
-author: "Yunni Qu"
+title: "Interactive Visualizations"
 output: 
     html_document:
         toc: TRUE
@@ -9,7 +8,7 @@ output:
 
 <br>
 
-This is my JSC370 Final Project website. I will showcase a few interactive visuals here.
+Here are some interactive visualizations :)
 
 <br>
 
@@ -46,39 +45,72 @@ opts_chunk$set(
 }
 ```
 
-<br>
+```{r load_data, message=FALSE, echo=FALSE, warning=FALSE}
 
-## First step
+data = read.csv("delay_weather.csv")
+data_delay = read.csv("Airline_Delay_Cause.csv")
 
-First I will source any necessary code, e.g. `process_covid_data.R`:
+data = data %>% mutate(pct_cancel = arr_cancelled/arr_flights,
+                 pct_delay= arr_delayed/arr_flights)
+p1_scatter <- data %>% 
+  plot_ly(x = ~arr_delayed, y = ~arr_cancelled,
+          type = 'scatter', mode = 'markers', color = ~region_name,
+          size = ~arr_delay_time, sizes = c(5, 70), marker = list(sizemode='diameter', opacity=0.5),
+          hoverinfo = 'text',
+          text = ~paste( paste(region_name, ":", sep=""), paste(" arrival flights: ", arr_flights, sep="") , paste(" number of arrival cancelled: ", arr_cancelled, sep=""), paste(" number of arrival delayed: ", arr_delayed, sep=""), sep = "<br>")) %>%
+  layout(title = "Number of Arrival Delayed vs Cancelled",
+                  yaxis = list(title = "Number of Arrival Cancelled"), xaxis = list(title = "Number of Arrival Delayed"),
+         hovermode = "compare")
+
+plt_smooth <- ggplot(
+  data,
+  aes(x = wind.sp, y = arr_delayed)
+) +
+  theme_minimal() +
+  geom_smooth() +
+  geom_point(aes(colour = region_name, size = wind.sp, alpha = 0.5)) 
+p2 = ggplotly(plt_smooth) %>%
+  layout(title = "Number of Arrival Delayed vs Wind Speed in the Region",
+                  yaxis = list(title = "Arrival Delays"), xaxis = list(title = "Wind Speed"))
+         
+
+data_delay_sum = data_delay %>%
+  group_by(month, airport) %>%
+  summarise(arr_delay = sum(arr_delay))
+
+plt_smooth_2 <- ggplot(
+  data_delay_sum,
+  aes(x = month, y = arr_delay)
+) +
+  theme_minimal() +
+  geom_line(aes(color = airport)) 
+p3 = ggplotly(plt_smooth_2) %>%
+  layout(title = "Flight Delays by Month",
+                  yaxis = list(title = "Arrival Delays"), xaxis = list(title = "Month"))
+
+```
 
 
-<br>
+## Number of Arrival Delayed vs Cancelled
+```{r, echo=FALSE}
+p1_scatter
+```
+This plot will have the number of delayed flights on the x-axis and the number of cancelled flights on the y-axis. Each point on the scatter plot will represent a specific region, with the color of the point indicating the region. The size of each point will be determined by the duration of the delay time. We also adds text to each point that will appear when hovering over the point. The text will display information about the region, including the total number of arrival flights, the number of cancelled arrivals, and the number of delayed arrivals.
 
-## Second step
+## Number of Arrival Delayed vs Wind Speed in the Region
 
-Then I will add some code to create the **plotly** figures
-
-Note: You need to name each code chunk, like this one: `plot1`
-
-<br>
-
-## Third step {.tabset}
-
-Create tabs to display each figure
-
-### Scatterplot: with DC
+```{r, echo=FALSE}
+p2
+```
+The x-axis represents wind speed, and the y-axis represents the number of delayed arrivals. Each point on the scatter plot represents a specific region, with the color of the point indicating the region, the size of the point indicating the wind. We fitted a regression line to the data points, which shows the overall trend of the data. This plot is interactive, so hovering over a data point displays a tooltip with detailed information about the region, including the wind speed and the number of delayed arrivals.
 
 
 
-### Scatterplot: without DC
 
+## Flight Delays by Month
 
-## {-}
+```{r, echo=FALSE}
+p3
+```
+The x-axis represents the month and the y-axis represents the total number of delayed arrivals. Each line on the plot represents a specific airport, with the color of the line indicating the airport. This plot is an interactive line plot that visualizes the trend of delayed arrivals over the months for different airports. We can hover over the lines to see detailed information about the number of delayed arrivals for each airport and month. This plot can help to identify patterns in flight delays across different airports and time periods.
 
-<br>
-
-Done!
-
-<br>
-<br>
