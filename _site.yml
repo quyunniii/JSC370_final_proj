@@ -9,9 +9,7 @@ navbar:
       href: visuals.html
   right:
     - icon: fa-github fa-lg
-      href: https://github.com/JSC370/jsc370-2023/
-    - text: "JSC370 Home"
-      href: https://jsc370.github.io/jsc370-2023/
+      href: https://github.com/quyunniii
 output:
   html_document:
     theme: cosmo
