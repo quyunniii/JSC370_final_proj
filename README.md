@@ -1,5 +1,5 @@
 > This is my JSC370 Final Project.  
-> The website is at: https://quyunniii.github.io/JSC370_final_proj/. 
+> The website is at: https://quyunniii.github.io/JSC370_final_proj/.  
 > We explored the question "What factors contribute to flight delays caused by weather?"  
 > We found that the proportion of delayed flights cause by weather differs by geographic location.   
 > Using linear model we found that visibility distance and wind speed have a negative relationship with proportion of weather delays, whereas relative humidity have a positive relation ship with it.  
