@@ -126,8 +126,16 @@ addLegend('bottomleft', pal = delay_pal, values = closest_station$weather_prop,
           title = "proportion of weather delay (%)", opacity = 1)
 
 ```
+## Map for Proportion of Weather Delays
 
-## Relationship between Visability Distance and Flight Delays
+```{r, echo=FALSE}
+p5
+```
+<p style="font-family: times, serif; font-size:12pt">
+This map shows the proportion of weather delays of the airports in the US. Where blue indicates low proportion of delay and red indicates high proportion of delay. We can see that there are a higher proportion of delays in the coastal region and eastern part of US.
+</p>
+
+## Relationship between Visibility Distance and Flight Delays
 
 ```{r, echo=FALSE}
 p1
@@ -165,11 +173,4 @@ p4
 The x-axis represents the month and the y-axis represents the total number of delayed arrivals. Each line on the plot represents a specific airport, with the color of the line indicating the airport. This plot is an interactive line plot that visualizes the trend of delayed arrivals over the months for different airports. We can hover over the lines to see detailed information about the number of delayed arrivals for each airport and month. This plot can help to identify patterns in flight delays across different airports and time periods.
 </p>
 
-## Map for Proportion of Weather Delays
 
-```{r, echo=FALSE}
-p5
-```
-<p style="font-family: times, serif; font-size:12pt">
-This map shows the proportion of weather delays of the airports in the US. Where blue indicates low proportion of delay and red indicates high proportion of delay. We can see that there are a higher proportion of delays in the coastal region and eastern part of US.
-</p>
