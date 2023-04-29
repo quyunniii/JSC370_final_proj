@@ -7,8 +7,170 @@ output:
         toc_float: TRUE
 ---
 
-<br>
+## About the Project 
+<p style="font-family: times, serif; font-size:14pt">
+This is my JSC370 Final Project website. I will investigate the question "What climate factors impact the number of flights delays in airports in the United States?". 
+</p>
 
-This is my JSC370 Final Project website. I will investigate the question "Is there a relationship between the number of flights delays and climate condition near the arrival airport?" with flight_delay data and weather data. I will showcase the data analysis process and interactive visuals here.
+<html>
+  <head>
+    <title>Title of the document</title>
+  </head>
+  <body>
+    <h2>Report</h2>
+    <p>Open the PDF version of the<a href="report.pdf"> final report</a>.</p>
+  </body>
+</html>
 
-<br>
+
+<p style="font-family: times, serif; font-size:14pt">
+Flight delays can have significant impacts on airlines, passengers, and airport operations, leading to financial losses and inconvenience for travelers. Understanding the causes of flight delays and their relationship with climate conditions can help airlines and passengers avoid the potential negative effect. We will focus on airports located in the United States and the climate conditions near these airports.
+</p>
+
+<p style="font-family: times, serif; font-size:14pt">
+We found that the proportion of delayed flights cause by weather differs by geographic location. Using linear model we found that visibility distance and wind speed have a negative relationship with proportion of weather delays, whereas relative humidity have a positive relation ship with it. We further investigate this relationship with random forest models, which can model non-linear relationship. With this model, we found that the top 3 factors contributing to the proportion of delayed flights are visibility distance, relative humidity and wind speed.
+
+</p>
+```{r setup, message=FALSE, echo=FALSE, warning=FALSE}
+
+library(data.table)
+library(tidyverse)
+library(dplyr)
+library(plotly)
+library(DT)
+library(knitr)
+library(leaflet)
+
+# Initialize code chunk options
+opts_chunk$set(
+  warning = FALSE,
+  message = FALSE,
+  eval=TRUE,
+  echo = TRUE,
+  cache = FALSE,
+  fig.width = 7, 
+  fig.align = 'center',
+  fig.asp = 0.618,
+  out.width = "700px",
+  class.source = "code-r")
+```
+
+```{r load_data, message=FALSE, echo=FALSE, warning=FALSE}
+
+data = read.csv("data/delay_weather.csv")
+data_delay = read.csv("data/Airline_Delay_Cause.csv")
+closest_station = data
+
+data = data %>% mutate(pct_cancel = arr_cancelled/arr_flights,
+                 pct_delay= arr_delayed/arr_flights)
+
+p1 <- ggplot(
+  data,
+  aes(x = vis.dist, y = weather_prop)
+) +
+  theme_minimal() +
+  geom_smooth(method = "lm", se = FALSE) +
+  geom_point(aes(colour = region_name, size = rh, alpha = 0.5)) 
+p1 = ggplotly(p1) %>%
+  layout(title = "Proportion of Arrival Delayed vs Visibility Distance in the Region",
+                  yaxis = list(title = "Arrival Delays"), xaxis = list(title = "Visibility Distance"))
+         
+p2 <- ggplot(
+  data,
+  aes(x = rh, y = weather_prop)
+) +
+  theme_minimal() +
+  geom_smooth(method = "lm", se = FALSE) +
+  geom_point(aes(colour = region_name, size = rh, alpha = 0.5)) 
+p2 = ggplotly(p2) %>%
+  layout(title = "Proportion of Arrival Delayed vs Relative Humidity in the Region",
+                  yaxis = list(title = "Arrival Delays"), xaxis = list(title = "Relative Humidity"))
+
+p3 <- ggplot(
+  data,
+  aes(x = wind.sp, y = weather_prop)
+) +
+  theme_minimal() +
+  geom_smooth(method = "lm", se = FALSE) +
+  geom_point(aes(colour = region_name, size = wind.sp, alpha = 0.5)) 
+p3 = ggplotly(p3) %>%
+  layout(title = "Proportion of Arrival Delayed vs Wind Speed in the Region",
+                  yaxis = list(title = "Arrival Delays"), xaxis = list(title = "Wind Speed"))
+
+data_delay_sum = data_delay %>%
+  group_by(month, airport) %>%
+  summarise(arr_delay = sum(arr_delay))
+
+p4 <- ggplot(
+  data_delay_sum,
+  aes(x = month, y = arr_delay)
+) +
+  theme_minimal() +
+  geom_line(aes(color = airport)) 
+p4 = ggplotly(p4) %>%
+  layout(title = "Flight Delays by Month",
+                  yaxis = list(title = "Arrival Delays"), xaxis = list(title = "Month"))
+
+delay_pal = colorNumeric(c('lightblue', 'pink','red', 'darkred'),
+                      domain = closest_station$weather_prop)
+p5 = leaflet(closest_station) %>%
+  addProviderTiles('OpenStreetMap') %>%
+  addCircles(lat = ~latitude_deg, lng = ~longitude_deg, color = ~delay_pal(weather_prop),
+             label = ~paste0(round(weather_prop, 3), 'delay'),
+             opacity = 1,
+             fillOpacity = 1,
+             radius = 500) %>%
+#  addMarkers(lat = ~lat, lng = ~lon,
+#             label = ~paste0(round(rh,2), 'rh'),
+#            data = top10) %>%
+addLegend('bottomleft', pal = delay_pal, values = closest_station$weather_prop,
+          title = "proportion of weather delay (%)", opacity = 1)
+
+```
+
+## Relationship between Visability Distance and Flight Delays
+
+```{r, echo=FALSE}
+p1
+```
+<p style="font-family: times, serif; font-size:12pt">
+The x-axis represents visibility distance, and the y-axis represents the proportion of weather delayed arrivals. Each point on the scatter plot represents a specific region, with the color of the point indicating the region, the size of the point indicating the visibility distance We fitted a regression line to the data points, which shows the overall trend of the data. This plot is interactive, so hovering over a data point displays a tooltip with detailed information about the region, including the visibility distance and the number of proportion of weather delayed arrivals.
+</p>
+
+## Relationship between Relative Humidity and Flight Delays
+
+```{r, echo=FALSE}
+p2
+```
+
+<p style="font-family: times, serif; font-size:12pt">
+The x-axis represents Relative Humidity, and the y-axis represents the number of proportion of weather delayed arrivals. Each point on the scatter plot represents a specific region, with the color of the point indicating the region, the size of the point indicating the wind. We fitted a regression line to the data points, which shows the overall trend of the data. This plot is interactive, so hovering over a data point displays a tooltip with detailed information about the region, including the Relative Humidity and the number of proportion of weather delayed arrivals.
+</p>
+
+## Relationship between Wind Speed and Flight Delays
+
+```{r, echo=FALSE}
+p3
+```
+<p style="font-family: times, serif; font-size:12pt">
+The x-axis represents wind speed, and the y-axis represents the number of proportion of weather delayed arrivals. Each point on the scatter plot represents a specific region, with the color of the point indicating the region, the size of the point indicating the wind. We fitted a regression line to the data points, which shows the overall trend of the data. This plot is interactive, so hovering over a data point displays a tooltip with detailed information about the region, including the wind speed and the number of proportion of weather delayed arrivals.
+</p>
+
+## Flight Delays by Month
+
+```{r, echo=FALSE}
+p4
+```
+
+<p style="font-family: times, serif; font-size:12pt">
+The x-axis represents the month and the y-axis represents the total number of delayed arrivals. Each line on the plot represents a specific airport, with the color of the line indicating the airport. This plot is an interactive line plot that visualizes the trend of delayed arrivals over the months for different airports. We can hover over the lines to see detailed information about the number of delayed arrivals for each airport and month. This plot can help to identify patterns in flight delays across different airports and time periods.
+</p>
+
+## Map for Proportion of Weather Delays
+
+```{r, echo=FALSE}
+p5
+```
+<p style="font-family: times, serif; font-size:12pt">
+This map shows the proportion of weather delays of the airports in the US. Where blue indicates low proportion of delay and red indicates high proportion of delay. We can see that there are a higher proportion of delays in the coastal region and eastern part of US.
+</p>

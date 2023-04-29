@@ -1,0 +1,1137 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>JSC370 Final Project Report</title>
+
+<script src="site_libs/header-attrs-2.20/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+<link rel="stylesheet" href="styles.css" type="text/css" />
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">JSC370 Final Project</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="intro.html">Introduction</a>
+</li>
+<li>
+  <a href="visuals.html">Interactive Visuals</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/quyunniii">
+    <span class="fa fa-github fa-lg"></span>
+     
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">JSC370 Final Project Report</h1>
+
+</div>
+
+
+<div id="flight-delays-and-climate-near-the-arrival-airport"
+class="section level1">
+<h1>Flight Delays and Climate Near the Arrival Airport</h1>
+<div id="yunni-qu" class="section level3">
+<h3>Yunni Qu</h3>
+</div>
+<div id="april-28-2023" class="section level3">
+<h3>April 28, 2023</h3>
+</div>
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p style="font-family: times, serif; font-size:12pt">
+Flight delays can have significant impacts on airlines, passengers, and
+airport operations, leading to financial losses and inconvenience for
+travelers. Understanding the causes of flight delays and their
+relationship with climate conditions can help airlines and passengers
+avoid the potential negative effect. We will focus on airports located
+in the United States and the climate near these airports.
+</p>
+<p style="font-family: times, serif; font-size:12pt">
+IATA code refers to the three-letter code assigned by the International
+Air Transport Association (IATA) to airports, airlines, and other
+aviation organizations. The IATA code is used to standardize and
+simplify air travel communications, such as flight itineraries, baggage
+tags, and ticketing. For airports, the IATA code usually consists of
+three letters that identify a specific airport. For example, JFK is the
+IATA code for John F. Kennedy International Airport in New York City.
+Here, we will use the IATA code to uniquely identify airports and join
+different data sets.
+</p>
+<p style="font-family: times, serif; font-size:12pt">
+The Bureau of Transportation Statistics (BTS) is a United States federal
+agency that is responsible for collecting, analyzing, and disseminating
+information on all modes of transportation in the United States. The
+agency was established in 1992 and is a part of the Department of
+Transportation. The primary goal of the BTS is to provide accurate and
+reliable data on transportation systems to support policy-making,
+research, and decision-making by government agencies, businesses, and
+the public. The agency collects and analyzes data on a wide range of
+transportation topics; we will mainly be using the data set that
+includes information on the number of delayed and cancelled flights, the
+airlines involved, the causes of delays, the length of delays, the
+departing airport, and the IATA code of the airport.
+</p>
+<p style="font-family: times, serif; font-size:12pt">
+The “OurAirports” project is an open-source initiative that provides
+detailed information on airports around the world. The project was
+launched in 2007 and is maintained by a community of volunteers who
+collect and verify data on airports from a variety of sources. The goal
+of the project is to provide accurate and up-to-date information on
+airports that can be used by a wide range of stakeholders, including
+aviation professionals, researchers, and travelers. The data provided by
+the project includes information on airport locations, runways,
+facilities, and services, as well as details on the number of flights
+and passengers at each airport. We will be using the part of data set
+includes airports in the United States with the IATA code, the location,
+longitude, and latitude.
+</p>
+<p style="font-family: times, serif; font-size:12pt">
+Additionally, we will work with the meteorological data presented in
+lecture consisting of weather station readings in the continental US. We
+will primarily be looking at the temperature, elevation, wind speed,
+visibility distance, atmospheric pressure, relative humidity, latitude,
+and longitude in this data set.
+</p>
+<p style="font-family: times, serif; font-size:12pt">
+In this project, we aim to provide valuable insights into the question:
+“What are the factor that contribute to weather flight delays?”
+</p>
+</div>
+<div id="methods" class="section level2">
+<h2>Methods</h2>
+<div id="data-collection" class="section level4">
+<h4>Data Collection</h4>
+<p style="font-family: times, serif; font-size:12pt">
+The flight delay data were taken from
+<a href="https://www.transtats.bts.gov/OT_Delay/OT_DelayCause1.asp?20=E">The
+Bureau of Transportation Statistics website</a>. Under where it says
+Airline On-Time Statistics and Delay Causes, there is a query to select
+the data. We took the data for all carriers and all airlines form
+November 2017 to November 2022. The airport locations data were
+downloaded from
+<a href="https://data.humdata.org/dataset/ourairports-usa">Ourairports
+project website</a>.
+</p>
+</div>
+<div id="data-cleaning-and-wrangling" class="section level4">
+<h4>Data Cleaning and Wrangling</h4>
+<p style="font-family: times, serif; font-size:12pt">
+In this part, we will discuss the data cleaning, filtering, and joining
+performed on the data sets. We first cleaned the three datasets
+separately, and then joined them to make the complete cleaned data for
+our analysis.
+</p>
+<p style="font-family: times, serif; font-size:12pt">
+There wasn’t any concerns with the range of the data when we looking at
+the summary of the variables. There are 4 columns of interests that
+contains “NAs”, so we will be removing these rows with missing values.
+These columns included “arr_flights”, “arr_cancelled”, “arr_del15”,
+“arr_delay”. By removing these rows, we were able to ensure that our
+analysis was based on complete data.
+</p>
+<p style="font-family: times, serif; font-size:12pt">
+We noticed that the “latitude_deg” and “longitude_deg” columns were
+stored as character strings. To perform any geographical analysis, we
+needed these columns to be numeric. To convert these columns, we convert
+the values from character to numeric data type. By doing this, we were
+able to ensure that our analysis was based on complete and relevant
+data.To gain a better understanding of the data set, we used the
+summarized the columns of interests to generate descriptive statistics
+for several variables in the data set. These variables included
+“latitude_deg”, “longitude_deg”, region_name, and “iata_code”. The
+“latitude_deg” and “longitude_deg” variables represented the latitude
+and longitude coordinates of the airports, while the other variables
+were related to airport codes and regions.After cleaning the data, we
+filtered the data set to remove rows with missing values in the columns
+of interests.By removing these rows, we were able to ensure that our
+analysis was based on complete and relevant data.
+</p>
+<p style="font-family: times, serif; font-size:12pt">
+We first summarized the ‘met’ data set to generate descriptive
+statistics for variables of interest. These variables include: “temp”,
+“elev”, “wind.sp”, “vis.dist”, “rh”. After examine the maximum and
+minimum of these variables, we found some usual values. These include
+the temperature of -40 and elevation of 9999. We replaced these values
+were with “NA”. Then, the met_subset variable is created by selecting
+only certain columns of interest from the ‘met’ data set: latitude,
+longitude, temperature, elevation, wind speed, visibility distance,
+atmospheric pressure, and relative humidity. Since there is only
+information for year and month in the flight delay data set, we will
+take the mean for the columns of interest in met_subset for each weather
+station. We expect larger airports to have more flights delays since
+there are more flights in larger airports. To more closely focus on the
+effect of weather on flight delays, we calculate a new column for the
+proportion of delays caused by weather. This is calculated by dividing
+the the number of weather delay by number of arrival delay for each
+airport.
+</p>
+<p style="font-family: times, serif; font-size:12pt">
+The Haversine formula is a mathematical formula used to calculate the
+shortest distance between two points on the surface of a sphere, such as
+the Earth. It is commonly used in navigation and geography to calculate
+distances between two points specified by their latitude and longitude
+coordinates. The formula takes into account the curvature of the Earth’s
+surface and calculates the shortest distance between two points along
+the surface of a sphere. It works by first converting the latitude and
+longitude coordinates of the two points into radians, and then using the
+difference between the latitudes and longitudes to calculate the angular
+distance between the two points. This angular distance is then used to
+calculate the great circle distance between the two points using the
+Haversine formula. We will use the Haversine formula to find the closest
+weather station to each airport.
+</p>
+<p style="font-family: times, serif; font-size:12pt">
+The two data frames delay_subset and airports were merged based on a
+common column IATA code. The merged data frame is then grouped by
+airport, and summary statistics are calculated for each airport, such as
+the total number of arriving flights, the number of cancelled flights,
+the number of delayed flights, and the total delay time. The longitude
+and latitude coordinates for each airport are also kept, as well as the
+name of the airport’s region. The resulting data frame contains one row
+per airport, with columns for each of the calculated summary statistics.
+</p>
+<p style="font-family: times, serif; font-size:12pt">
+The resulting data frame is merged with the “met_subset” data frame to
+create a Cartesian product of the two data frames. Then, the distance is
+calculated between the airport and weather station locations using the
+Haversine formula. The resulting data frame is again grouped by the
+“airport” column and the row with the minimum distance is selected for
+each group. The final output data frame contains information on the
+airport, its closest weather station, delay statistics, and airport
+location information. This data set will hopefully provides valuable
+insights into the relationship between airport delays and weather
+patterns. Table 1 shows a subset of our dataset.
+</p>
+<table>
+<colgroup>
+<col width="8%" />
+<col width="12%" />
+<col width="14%" />
+<col width="13%" />
+<col width="14%" />
+<col width="9%" />
+<col width="8%" />
+<col width="9%" />
+<col width="7%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">airport</th>
+<th align="right">arr_delayed</th>
+<th align="right">arr_cancelled</th>
+<th align="right">weather_prop</th>
+<th align="left">region_name</th>
+<th align="right">elev</th>
+<th align="right">wind.sp</th>
+<th align="right">vis.dist</th>
+<th align="right">rh</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">ABE</td>
+<td align="right">74</td>
+<td align="right">9</td>
+<td align="right">0.122</td>
+<td align="left">Pennsylvania</td>
+<td align="right">117.003</td>
+<td align="right">2.248</td>
+<td align="right">14432.14</td>
+<td align="right">70.364</td>
+</tr>
+<tr class="even">
+<td align="left">ABI</td>
+<td align="right">37</td>
+<td align="right">4</td>
+<td align="right">0.007</td>
+<td align="left">Texas</td>
+<td align="right">546.000</td>
+<td align="right">4.690</td>
+<td align="right">15979.66</td>
+<td align="right">49.096</td>
+</tr>
+<tr class="odd">
+<td align="left">ABQ</td>
+<td align="right">409</td>
+<td align="right">15</td>
+<td align="right">0.029</td>
+<td align="left">NewMexico</td>
+<td align="right">1619.793</td>
+<td align="right">3.517</td>
+<td align="right">16031.68</td>
+<td align="right">38.117</td>
+</tr>
+<tr class="even">
+<td align="left">ABR</td>
+<td align="right">7</td>
+<td align="right">0</td>
+<td align="right">0.000</td>
+<td align="left">SouthDakota</td>
+<td align="right">396.448</td>
+<td align="right">3.551</td>
+<td align="right">14066.22</td>
+<td align="right">77.158</td>
+</tr>
+<tr class="odd">
+<td align="left">ABY</td>
+<td align="right">18</td>
+<td align="right">1</td>
+<td align="right">0.200</td>
+<td align="left">Georgia</td>
+<td align="right">59.000</td>
+<td align="right">2.004</td>
+<td align="right">14139.52</td>
+<td align="right">77.747</td>
+</tr>
+<tr class="even">
+<td align="left">ACK</td>
+<td align="right">89</td>
+<td align="right">9</td>
+<td align="right">0.029</td>
+<td align="left">Massachusetts</td>
+<td align="right">21.000</td>
+<td align="right">2.649</td>
+<td align="right">13292.73</td>
+<td align="right">83.958</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="data-exploration" class="section level4">
+<h4>Data Exploration</h4>
+<p style="font-family: times, serif; font-size:12pt">
+Now let’s explore our cleaned dataset.
+</p>
+<div class="figure">
+<img src="report_files/figure-html/unnamed-chunk-17-1.png" alt="Distribution of Arrivel Flights Cancelled in the US in August 2019" width="384" />
+<p class="caption">
+Distribution of Arrivel Flights Cancelled in the US in August 2019
+</p>
+</div>
+<p style="font-family: times, serif; font-size:12pt">
+Figure 1 shows the number of flights on the y-axis and the number of
+cancelled flights on the x-axis. The shape of the histogram is right
+skewed, indicating that most airports have less flights cancelled, while
+fewer airports have a large number of cancelled flight.
+</p>
+<div class="figure">
+<img src="report_files/figure-html/unnamed-chunk-18-1.png" alt="Distribution of Arrivel Flights Delayed in the US in August 2019" width="384" />
+<p class="caption">
+Distribution of Arrivel Flights Delayed in the US in August 2019
+</p>
+</div>
+<p style="font-family: times, serif; font-size:12pt">
+Figure 2 shows the number of flights on the y-axis and the number of
+delayed flights on the x-axis. The shape of the histogram is right
+skewed, indicating that most airports experience less flight delays,
+while fewer airports have a large number of delayed flight.
+</p>
+<div class="figure">
+<img src="report_files/figure-html/unnamed-chunk-19-1.png" alt="Proportion of Weather Delays in the US in August 2019" width="384" />
+<p class="caption">
+Proportion of Weather Delays in the US in August 2019
+</p>
+</div>
+<p style="font-family: times, serif; font-size:12pt">
+Figure 3 shows the number of flights on the y-axis and the number of
+delayed flights cause by weather on the x-axis. The shape of the
+histogram is right skewed, indicating that most airports experience less
+weather flight delays, while fewer airports have a large number of
+weather delayed flights.
+</p>
+</div>
+<div id="modeling" class="section level4">
+<h4>Modeling</h4>
+<p style="font-family: times, serif; font-size:12pt">
+In order to find the relationship between different weather condition
+indicators and the proportion of flight delays, we will use linear model
+and random forest model. We will fit linear regression models to the
+data, with the proportion of weather delayed flights as the response
+variable and the other variables as predictor variables. The linear
+regression models will provide estimates of the effects of each
+predictor variable on the proportion of weather delayed flights. We will
+also be traning a random forest model which will help us model the
+non-linear relationship if it exist.
+</p>
+</div>
+</div>
+<div id="results" class="section level2">
+<h2>Results</h2>
+<div id="data-summary" class="section level4">
+<h4>Data Summary</h4>
+<p style="font-family: times, serif; font-size:12pt">
+Now we will summarize and group flight data by region, calculating the
+proportion of weather delayed flights and delayed flights for each
+region.
+</p>
+<table>
+<caption>Proportion of Weather Delayed Flights by State</caption>
+<colgroup>
+<col width="19%" />
+<col width="38%" />
+<col width="16%" />
+<col width="25%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">State</th>
+<th align="right">proportion of weather delayed flights</th>
+<th align="right">mean wind speed</th>
+<th align="right">mean visability distance</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Alabama</td>
+<td align="right">0.132</td>
+<td align="right">2.172</td>
+<td align="right">14170.89</td>
+</tr>
+<tr class="even">
+<td align="left">Alaska</td>
+<td align="right">0.016</td>
+<td align="right">1.882</td>
+<td align="right">14266.22</td>
+</tr>
+<tr class="odd">
+<td align="left">Arizona</td>
+<td align="right">0.011</td>
+<td align="right">3.104</td>
+<td align="right">16001.59</td>
+</tr>
+<tr class="even">
+<td align="left">Arkansas</td>
+<td align="right">0.064</td>
+<td align="right">2.468</td>
+<td align="right">14784.27</td>
+</tr>
+<tr class="odd">
+<td align="left">California</td>
+<td align="right">0.056</td>
+<td align="right">2.834</td>
+<td align="right">14570.89</td>
+</tr>
+<tr class="even">
+<td align="left">Colorado</td>
+<td align="right">0.040</td>
+<td align="right">3.382</td>
+<td align="right">15915.58</td>
+</tr>
+<tr class="odd">
+<td align="left">Connecticut</td>
+<td align="right">0.036</td>
+<td align="right">2.606</td>
+<td align="right">14734.30</td>
+</tr>
+<tr class="even">
+<td align="left">DistrictofColumbia</td>
+<td align="right">0.054</td>
+<td align="right">3.297</td>
+<td align="right">15844.21</td>
+</tr>
+<tr class="odd">
+<td align="left">Florida</td>
+<td align="right">0.074</td>
+<td align="right">2.848</td>
+<td align="right">14828.20</td>
+</tr>
+<tr class="even">
+<td align="left">Georgia</td>
+<td align="right">0.181</td>
+<td align="right">2.407</td>
+<td align="right">14376.92</td>
+</tr>
+<tr class="odd">
+<td align="left">Hawaii</td>
+<td align="right">0.004</td>
+<td align="right">2.647</td>
+<td align="right">10101.02</td>
+</tr>
+<tr class="even">
+<td align="left">Idaho</td>
+<td align="right">0.015</td>
+<td align="right">3.817</td>
+<td align="right">16037.53</td>
+</tr>
+<tr class="odd">
+<td align="left">Illinois</td>
+<td align="right">0.098</td>
+<td align="right">2.884</td>
+<td align="right">14689.83</td>
+</tr>
+<tr class="even">
+<td align="left">Indiana</td>
+<td align="right">0.066</td>
+<td align="right">2.913</td>
+<td align="right">14698.32</td>
+</tr>
+<tr class="odd">
+<td align="left">Iowa</td>
+<td align="right">0.134</td>
+<td align="right">2.991</td>
+<td align="right">14087.31</td>
+</tr>
+<tr class="even">
+<td align="left">Kansas</td>
+<td align="right">0.064</td>
+<td align="right">4.303</td>
+<td align="right">14969.64</td>
+</tr>
+<tr class="odd">
+<td align="left">Kentucky</td>
+<td align="right">0.073</td>
+<td align="right">2.691</td>
+<td align="right">14696.33</td>
+</tr>
+<tr class="even">
+<td align="left">Louisiana</td>
+<td align="right">0.084</td>
+<td align="right">2.014</td>
+<td align="right">14261.64</td>
+</tr>
+<tr class="odd">
+<td align="left">Maine</td>
+<td align="right">0.071</td>
+<td align="right">2.602</td>
+<td align="right">13477.71</td>
+</tr>
+<tr class="even">
+<td align="left">Maryland</td>
+<td align="right">0.121</td>
+<td align="right">2.498</td>
+<td align="right">14448.25</td>
+</tr>
+<tr class="odd">
+<td align="left">Massachusetts</td>
+<td align="right">0.083</td>
+<td align="right">3.356</td>
+<td align="right">13506.22</td>
+</tr>
+<tr class="even">
+<td align="left">Michigan</td>
+<td align="right">0.060</td>
+<td align="right">2.738</td>
+<td align="right">14631.14</td>
+</tr>
+<tr class="odd">
+<td align="left">Minnesota</td>
+<td align="right">0.049</td>
+<td align="right">2.455</td>
+<td align="right">14989.59</td>
+</tr>
+<tr class="even">
+<td align="left">Mississippi</td>
+<td align="right">0.141</td>
+<td align="right">1.810</td>
+<td align="right">13465.15</td>
+</tr>
+<tr class="odd">
+<td align="left">Missouri</td>
+<td align="right">0.053</td>
+<td align="right">2.811</td>
+<td align="right">14597.20</td>
+</tr>
+<tr class="even">
+<td align="left">Montana</td>
+<td align="right">0.030</td>
+<td align="right">2.759</td>
+<td align="right">15880.64</td>
+</tr>
+<tr class="odd">
+<td align="left">Nebraska</td>
+<td align="right">0.129</td>
+<td align="right">3.647</td>
+<td align="right">14491.03</td>
+</tr>
+<tr class="even">
+<td align="left">Nevada</td>
+<td align="right">0.028</td>
+<td align="right">2.759</td>
+<td align="right">16073.53</td>
+</tr>
+<tr class="odd">
+<td align="left">NewHampshire</td>
+<td align="right">0.086</td>
+<td align="right">2.138</td>
+<td align="right">13296.51</td>
+</tr>
+<tr class="even">
+<td align="left">NewJersey</td>
+<td align="right">0.036</td>
+<td align="right">2.786</td>
+<td align="right">14392.81</td>
+</tr>
+<tr class="odd">
+<td align="left">NewMexico</td>
+<td align="right">0.047</td>
+<td align="right">3.879</td>
+<td align="right">15954.37</td>
+</tr>
+<tr class="even">
+<td align="left">NewYork</td>
+<td align="right">0.069</td>
+<td align="right">2.888</td>
+<td align="right">14813.57</td>
+</tr>
+<tr class="odd">
+<td align="left">NorthCarolina</td>
+<td align="right">0.086</td>
+<td align="right">2.226</td>
+<td align="right">14292.53</td>
+</tr>
+<tr class="even">
+<td align="left">NorthDakota</td>
+<td align="right">0.030</td>
+<td align="right">3.903</td>
+<td align="right">15275.52</td>
+</tr>
+<tr class="odd">
+<td align="left">Ohio</td>
+<td align="right">0.061</td>
+<td align="right">3.070</td>
+<td align="right">14728.25</td>
+</tr>
+<tr class="even">
+<td align="left">Oklahoma</td>
+<td align="right">0.148</td>
+<td align="right">3.949</td>
+<td align="right">15113.70</td>
+</tr>
+<tr class="odd">
+<td align="left">Oregon</td>
+<td align="right">0.008</td>
+<td align="right">2.047</td>
+<td align="right">14774.22</td>
+</tr>
+<tr class="even">
+<td align="left">Pennsylvania</td>
+<td align="right">0.113</td>
+<td align="right">2.304</td>
+<td align="right">14357.65</td>
+</tr>
+<tr class="odd">
+<td align="left">RhodeIsland</td>
+<td align="right">0.090</td>
+<td align="right">3.236</td>
+<td align="right">14743.51</td>
+</tr>
+<tr class="even">
+<td align="left">SouthCarolina</td>
+<td align="right">0.120</td>
+<td align="right">2.216</td>
+<td align="right">14270.44</td>
+</tr>
+<tr class="odd">
+<td align="left">SouthDakota</td>
+<td align="right">0.053</td>
+<td align="right">3.793</td>
+<td align="right">14653.43</td>
+</tr>
+<tr class="even">
+<td align="left">Tennessee</td>
+<td align="right">0.093</td>
+<td align="right">1.965</td>
+<td align="right">15033.98</td>
+</tr>
+<tr class="odd">
+<td align="left">Texas</td>
+<td align="right">0.044</td>
+<td align="right">4.064</td>
+<td align="right">15722.62</td>
+</tr>
+<tr class="even">
+<td align="left">Utah</td>
+<td align="right">0.022</td>
+<td align="right">3.016</td>
+<td align="right">15993.40</td>
+</tr>
+<tr class="odd">
+<td align="left">Vermont</td>
+<td align="right">0.055</td>
+<td align="right">2.735</td>
+<td align="right">15442.77</td>
+</tr>
+<tr class="even">
+<td align="left">Virginia</td>
+<td align="right">0.078</td>
+<td align="right">2.282</td>
+<td align="right">14719.31</td>
+</tr>
+<tr class="odd">
+<td align="left">Washington</td>
+<td align="right">0.008</td>
+<td align="right">1.267</td>
+<td align="right">15119.59</td>
+</tr>
+<tr class="even">
+<td align="left">WestVirginia</td>
+<td align="right">0.139</td>
+<td align="right">1.509</td>
+<td align="right">13596.59</td>
+</tr>
+<tr class="odd">
+<td align="left">Wisconsin</td>
+<td align="right">0.068</td>
+<td align="right">2.456</td>
+<td align="right">14634.24</td>
+</tr>
+<tr class="even">
+<td align="left">Wyoming</td>
+<td align="right">0.019</td>
+<td align="right">3.902</td>
+<td align="right">15709.50</td>
+</tr>
+</tbody>
+</table>
+<p style="font-family: times, serif; font-size:12pt">
+The table above shows the mean proportion of delayed flights because of
+the weather for each state in the US. We see that the statistics
+significantly differs by state. For Alaska, the proportion of weather
+delayed flights was 0.132 and . This number is significantly lower for
+Arizona, which have a weather flight delay proportion of 0.011. In this
+table, we see that the proportion of wather delayed flights varies by
+geographic region.
+</p>
+</div>
+<div id="linear-model" class="section level4">
+<h4>Linear Model</h4>
+<div class="figure">
+<img src="report_files/figure-html/unnamed-chunk-21-1.png" alt="Realationship between Wind Speed and Proportion of Weather Flight Delays" width="384" />
+<p class="caption">
+Realationship between Wind Speed and Proportion of Weather Flight Delays
+</p>
+</div>
+<p style="font-family: times, serif; font-size:12pt">
+Figure 4 shows the relationship between wind speed near the airport and
+proportion of flight delayed cause by weather in the airport. The
+horizontal axis (X-axis) represents the wind speed and the vertical axis
+(Y-axis) represents the proportion of flight delay, measured as a
+proportion from 0 to 1. The point are colored by temperature. Each point
+on the scatter plot represents a specific airport, with the wind speed
+and proportion of flight delay for that point plotted as a coordinate.
+We see a generally downward trend with the two variables. As wind speed
+increases, the proportion of flight delay decreases. There are no
+outliers or unusual observations.
+</p>
+<p style="font-family: times, serif; font-size:12pt">
+Table 3 is the summary for this linear model of wind speed near the
+airport and proportion of flight delayed. The intercept coefficient of
+0.0913 represents the estimated value of y when wind speed is 0. The
+coefficient for wind speed is -0.0094, indicating that for every unit
+increase in wind speed, the estimated value of y decreases by 0.0094.
+Therefore, there is a negative relationship between wind speed and
+proportion of weather delayed flights, meaning that as wind speed
+increases, the value of proportion of weather delayed flights tends to
+decrease.
+</p>
+<div class="figure">
+<img src="report_files/figure-html/unnamed-chunk-23-1.png" alt="Relationship between Visibility Distance and Proportion of Flight Delayed" width="384" />
+<p class="caption">
+Relationship between Visibility Distance and Proportion of Flight
+Delayed
+</p>
+</div>
+<p style="font-family: times, serif; font-size:12pt">
+Figure 5 shows the relationship between visibility distance near the
+airport and proportion of flight delayed in the airport. The horizontal
+axis (X-axis) represents the visibility distance and the vertical axis
+(Y-axis) represents the proportion of flight delay.Each point on the
+scatter plot represents a specific airport. We see downward trend the
+two variables. As visibility distance increases, the proportion of
+flight delay decreases.
+</p>
+<p style="font-family: times, serif; font-size:12pt">
+Table 4 is the summary for the linear model of visibility distance near
+the airport and proportion of flight delayed. The intercept coefficient
+of 0.2570 represents the estimated value of y when visibility distance
+is 0. The coefficient for visibility distance is really small, because
+of the huge difference in the values of visibility distance and
+proportion of delayed flights. However, looking at the P-value,
+visibility distance is a good predictor for proportion of delayed
+flights. There is a negative relationship between visibility distance
+and proportion of weather delayed flights, meaning that as visibility
+distance increases, the value of proportion of weather delayed flights
+tends to decrease.
+</p>
+<div class="figure">
+<img src="report_files/figure-html/unnamed-chunk-25-1.png" alt="Relationship between Relative Humidity and Proportion of Flight Delayed" width="384" />
+<p class="caption">
+Relationship between Relative Humidity and Proportion of Flight Delayed
+</p>
+</div>
+<p style="font-family: times, serif; font-size:12pt">
+Figure 6 shows the relationship between relative humidity near the
+airport and proportion of flight delayed in the airport. The horizontal
+axis (X-axis) represents the Relative Humidity and the vertical axis
+(Y-axis) represents the proportion of flight delay.Each point on the
+scatter plot represents a specific airport. We see an upward trend the
+two variables. As Relative Humidity increases, the proportion of flight
+delay also increases.
+</p>
+<p style="font-family: times, serif; font-size:12pt">
+Table 5 is the summary for the linear model of relative humidity near
+the airport and proportion of flight delayed. The intercept coefficient
+of 0.0913 represents the estimated value of y when wind speed is 0. The
+coefficient for wind speed is -0.0094, indicating that for every unit
+increase in wind speed, the estimated value of y decreases by 0.0094.
+Therefore, there is a negative relationship between wind speed and
+proportion of weather delayed flights, meaning that as wind speed
+increases, the value of proportion of weather delayed flights tends to
+decrease.
+</p>
+</div>
+<div id="random-forest" class="section level4">
+<h4>Random Forest</h4>
+<p style="font-family: times, serif; font-size:12pt">
+This scatter plot shows the relationship between proportion of cancelled
+flight and proportion of delayed flight in the airport. The horizontal
+axis (X-axis) represents the proportion of cancelled flight and the
+vertical axis (Y-axis) represents the proportion of delayed flights,
+measured as a proportion from 0 to 1. We see a strong positive
+relationship between the 2 variables.
+</p>
+<p><img src="report_files/figure-html/unnamed-chunk-30-1.png" width="672" /></p>
+<table>
+<thead>
+<tr class="header">
+<th align="right">mse</th>
+<th align="right">median_y</th>
+<th align="right">mean_y</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">0.0034523</td>
+<td align="right">0.048</td>
+<td align="right">0.075</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div id="conclusion-and-summary" class="section level2">
+<h2>Conclusion and Summary</h2>
+<p style="font-family: times, serif; font-size:12pt">
+In this report, we hope to answer the question “What factors contribute
+to flight delays caused by weather?”. From our summary of the data, we
+found that the proportion of delayed flights cause by weather differs by
+geographic location. Using linear model we found that visibility
+distance and wind speed have a negative relationship with proportion of
+weather delays, whereas relative humidity have a positive relation ship
+with it. Next, we further investigate this relationship with random
+forest models, which can model non-linear relationship. With this model,
+we found that the top 3 factors contributing to the proportion of
+delayed flights are visibility distance, relative humidity and wind
+speed.
+</p>
+<div id="limitations" class="section level4">
+<h4>Limitations</h4>
+<p style="font-family: times, serif; font-size:12pt">
+There are several limitations to this project. First, the amount of data
+we are able to use is small. The flight delay data we have is summed for
+each day not every hour. Since weather conditions can change relatively
+fast, daily summaries might not be enough information. Another
+limitation is the model we used, although random forest is powerful for
+regression task, it’s difficult to interpret. We weren’t able to see in
+which direction each variable contributed to the result.
+</p>
+</div>
+</div>
+</div>
+
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

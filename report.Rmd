@@ -1,0 +1,451 @@
+---
+title: "JSC370 Final Project Report"
+output: pdf_document
+---
+
+
+
+# Flight Delays and Climate Near the Arrival Airport
+
+### Yunni Qu
+
+### April 28, 2023
+
+## Introduction 
+
+<p style="font-family: times, serif; font-size:12pt">
+Flight delays can have significant impacts on airlines, passengers, and airport operations, leading to financial losses and inconvenience for travelers. Understanding the causes of flight delays and their relationship with climate conditions can help airlines and passengers avoid the potential negative effect. We will focus on airports located in the United States and the climate near these airports.
+</p>
+<p style="font-family: times, serif; font-size:12pt">
+IATA code refers to the three-letter code assigned by the International Air Transport Association (IATA) to airports, airlines, and other aviation organizations. The IATA code is used to standardize and simplify air travel communications, such as flight itineraries, baggage tags, and ticketing. For airports, the IATA code usually consists of three letters that identify a specific airport. For example, JFK is the IATA code for John F. Kennedy International Airport in New York City. Here, we will use the IATA code to uniquely identify airports and join different data sets.
+</p>
+<p style="font-family: times, serif; font-size:12pt">
+The Bureau of Transportation Statistics (BTS) is a United States federal agency that is responsible for collecting, analyzing, and disseminating information on all modes of transportation in the United States. The agency was established in 1992 and is a part of the Department of Transportation. The primary goal of the BTS is to provide accurate and reliable data on transportation systems to support policy-making, research, and decision-making by government agencies, businesses, and the public. The agency collects and analyzes data on a wide range of transportation topics; we will mainly be using the data set that includes information on the number of delayed and cancelled flights, the airlines involved, the causes of delays, the length of delays, the departing airport, and the IATA code of the airport.
+</p>
+<p style="font-family: times, serif; font-size:12pt">
+The "OurAirports" project is an open-source initiative that provides detailed information on airports around the world. The project was launched in 2007 and is maintained by a community of volunteers who collect and verify data on airports from a variety of sources. The goal of the project is to provide accurate and up-to-date information on airports that can be used by a wide range of stakeholders, including aviation professionals, researchers, and travelers. The data provided by the project includes information on airport locations, runways, facilities, and services, as well as details on the number of flights and passengers at each airport. We will be using the part of data set includes airports in the United States with the IATA code, the location, longitude, and latitude.
+</p>
+<p style="font-family: times, serif; font-size:12pt">
+Additionally, we will work with the meteorological data presented in lecture consisting of weather station readings in the continental US. We will primarily be looking at the temperature, elevation, wind speed, visibility distance, atmospheric pressure, relative humidity, latitude, and longitude in this data set.
+</p>
+<p style="font-family: times, serif; font-size:12pt">
+In this project, we aim to provide valuable insights into the question: "What are the factor that contribute to weather flight delays?"
+</p>
+
+
+## Methods 
+
+#### Data Collection
+
+<p style="font-family: times, serif; font-size:12pt">
+The flight delay data were taken from <a href="https://www.transtats.bts.gov/OT_Delay/OT_DelayCause1.asp?20=E">The Bureau of Transportation Statistics website</a>. Under where it says Airline On-Time Statistics and Delay Causes, there is a query to select the data. We took the data for all carriers and all airlines form November 2017 to November 2022. The airport locations data were downloaded from <a href="https://data.humdata.org/dataset/ourairports-usa">Ourairports project website</a>.
+</p>
+
+#### Data Cleaning and Wrangling
+
+<p style="font-family: times, serif; font-size:12pt">
+In this part, we will discuss the data cleaning, filtering, and joining performed on the data sets. We first cleaned the three datasets separately, and then joined them to make the complete cleaned data for our analysis.
+</p>
+
+
+```{r, echo=FALSE, results='hide', warning=FALSE, message=FALSE}
+#install.packages("stargazer")
+library(knitr)
+library(tidyverse)
+library(data.table)
+library(leaflet)
+library(stargazer)
+library(xtable)
+```
+```{r, echo=FALSE,results='hide', warning=FALSE}
+# Set the file path
+file_path_delay <- "data/Airline_Delay_Cause.csv"
+delay <- read.csv(file_path_delay, header = TRUE, sep = ",")
+delay = as.data.frame(apply(delay, 2, function(x) gsub('\\s+', '', x)))
+head(delay)
+```
+
+```{r, echo=FALSE,results='hide'}
+delay$month <- as.numeric(delay$month)
+delay$year <- as.numeric(delay$year)
+summary(delay$month)
+summary(delay$arr_flights)
+summary(delay$arr_cancelled)
+summary(delay$arr_del15)#count
+summary(delay$arr_delay)#time
+
+summary(delay$year)
+```
+```{r, echo=FALSE,results='hide'}
+delay = na.omit(delay, arr_flights)
+delay = na.omit(delay, arr_cancelled)
+delay = na.omit(delay, arr_del15)
+delay = na.omit(delay, arr_delay)
+
+delay_subset = delay[, c("year", "month", "airport", "arr_flights", "arr_cancelled", "arr_del15", "arr_delay", "weather_delay")] 
+delay_subset = delay_subset %>% filter(year == 2019, month == 8)
+head(delay_subset)
+delay_subset$month <- as.numeric(delay_subset$month)
+delay_subset$arr_flights <- as.numeric(delay_subset$arr_flights)
+delay_subset$arr_cancelled <- as.numeric(delay_subset$arr_cancelled)
+delay_subset$arr_del15 <- as.numeric(delay_subset$arr_del15)
+delay_subset$arr_delay <- as.numeric(delay_subset$arr_delay)
+delay_subset$weather_delay <- as.numeric(delay_subset$weather_delay)
+```
+<p style="font-family: times, serif; font-size:12pt">
+There wasn't any concerns with the range of the data when we looking at the summary of the variables. There are 4 columns of interests that contains "NAs", so we will be removing these rows with missing values. These columns included "arr_flights", "arr_cancelled", "arr_del15", "arr_delay". By removing these rows, we were able to ensure that our analysis was based on complete data.
+</p>
+
+
+
+```{r, echo=FALSE, results='hide'}
+file_path_airports <- "data/us-airports.csv"
+airports <- read.csv(file_path_airports, header = TRUE, sep = ",")
+airports = as.data.frame(apply(airports, 2, function(x) gsub('\\s+', '', x)))
+head(airports)
+
+```
+```{r, echo=FALSE,results='hide', warning=FALSE}
+airports$latitude_deg <- as.numeric(airports$latitude_deg)
+airports$longitude_deg <- as.numeric(airports$longitude_deg)
+```
+
+```{r, echo=FALSE,results='hide'}
+summary(airports$latitude_deg)
+summary(airports$longitude_deg)
+summary(airports$region_name)
+summary(airports$iata_code)
+#airports = na.omit(airports, latitude_deg)
+airports = airports[, c("iata_code", "region_name", "longitude_deg", "latitude_deg")]
+```
+
+
+<p style="font-family: times, serif; font-size:12pt">
+We noticed that the "latitude_deg" and "longitude_deg" columns were stored as character strings. To perform any geographical analysis, we needed these columns to be numeric. To convert these columns, we convert the values from character to numeric data type. By doing this, we were able to ensure that our analysis was based on complete and relevant data.To gain a better understanding of the data set, we used the summarized the columns of interests to generate descriptive statistics for several variables in the data set. These variables included "latitude_deg", "longitude_deg", region_name, and "iata_code". The "latitude_deg" and "longitude_deg" variables represented the latitude and longitude coordinates of the airports, while the other variables were related to airport codes and regions.After cleaning the data, we filtered the data set to remove rows with missing values in the columns of interests.By removing these rows, we were able to ensure that our analysis was based on complete and relevant data.
+</p>
+
+
+```{r data, echo=FALSE,results='hide', warning=FALSE}
+met <- data.table::fread("data/met_all.gz")
+```
+```{r, echo=FALSE,results='hide'}
+summary(met$temp)
+summary(met$elev)
+summary(met$wind.sp)
+summary(met$vis.dist)#visibility distance
+summary(met$atm.press)
+summary(met$rh)#relative humidity
+```
+```{r, echo=FALSE,results='hide'}
+met = met[!(met$temp == -40.00)]
+met$elev[met$elev == 9999.0] = NA
+#met$vis.dist[met$vis.dist == 0] = NA
+#met$vis.dist[met$vis.dist == 160000] = NA
+head(met)
+```
+
+```{r, echo=FALSE,results='hide'}
+met_subset = met[, c("USAFID", "lat", "lon", "temp", "elev", "wind.sp", "vis.dist",  "rh")]
+#calculating average
+met_subset = met_subset %>% 
+  group_by(USAFID) %>%
+  summarise(lat = min(lat, na.rm = TRUE),
+            lon = min(lon, na.rm = TRUE),
+            temp = mean(temp, na.rm = TRUE),
+            elev = mean(elev, na.rm = TRUE),
+            wind.sp = mean(wind.sp, na.rm = TRUE),
+            vis.dist = mean(vis.dist, na.rm = TRUE),
+            rh = mean(rh, na.rm = TRUE))
+head(met_subset)
+
+```
+
+<p style="font-family: times, serif; font-size:12pt">
+We first summarized the 'met' data set to generate descriptive statistics for variables of interest. These variables include: "temp", "elev", "wind.sp", "vis.dist", "rh". After examine the maximum and minimum of these variables, we found some usual values. These include the  temperature of -40 and elevation of 9999. We replaced these values were with "NA". 
+Then, the met_subset variable is created by selecting only certain columns of interest from the 'met' data set: latitude, longitude, temperature, elevation, wind speed, visibility distance, atmospheric pressure, and relative humidity. Since there is only information for year and month in the flight delay data set, we will take the mean for the columns of interest in met_subset for each weather station. We expect larger airports to have more flights delays since there are more flights in larger airports. To more closely focus on the effect of weather on flight delays, we calculate a new column for the proportion of delays caused by weather. This is calculated by dividing the the number of weather delay by number of arrival delay for each airport.
+</p>
+
+
+
+```{r, echo=FALSE,results='hide'}
+airports_delay <- merge(delay_subset, airports, by.x = "airport", by.y = "iata_code") %>%
+  group_by(airport) %>%
+  summarise(arr_flights = sum(arr_flights, na.rm = TRUE),
+            arr_cancelled = sum(arr_cancelled, na.rm = TRUE),
+            arr_delayed = sum(arr_del15, na.rm = TRUE),
+            arr_delay_time = sum(arr_delay, na.rm = TRUE), weather_prop = mean(weather_delay/arr_delay, na.rm = TRUE),
+            longitude_deg = mean(longitude_deg, na.rm = TRUE),
+            latitude_deg = mean(latitude_deg, na.rm = TRUE),
+            region_name = min(region_name))
+```
+
+
+```{r, echo=FALSE,results='hide'}
+airports_delay
+```
+
+```{r, echo=FALSE,results='hide'}
+haversine_distance <- function(lat1, lon1, lat2, lon2) {
+  R <- 6371 # Earth's radius in km
+  dlat <- (lat2 - lat1) * pi / 180
+  dlon <- (lon2 - lon1) * pi / 180
+  a <- sin(dlat/2)^2 + cos(lat1 * pi / 180) * cos(lat2 * pi / 180) * sin(dlon/2)^2
+  c <- 2 * atan2(sqrt(a), sqrt(1-a))
+  d <- R * c
+  return(d)
+}
+```
+
+```{r, echo=FALSE,results='hide'}
+closest_station = merge(airports_delay, met_subset, by=NULL) %>%
+  mutate(d = haversine_distance(latitude_deg, longitude_deg, lat, lon)) %>%
+  group_by(airport) %>%
+  slice_min(d) # find the minimum d row
+```
+<p style="font-family: times, serif; font-size:12pt">
+The Haversine formula is a mathematical formula used to calculate the shortest distance between two points on the surface of a sphere, such as the Earth. It is commonly used in navigation and geography to calculate distances between two points specified by their latitude and longitude coordinates. The formula takes into account the curvature of the Earth's surface and calculates the shortest distance between two points along the surface of a sphere. It works by first converting the latitude and longitude coordinates of the two points into radians, and then using the difference between the latitudes and longitudes to calculate the angular distance between the two points. This angular distance is then used to calculate the great circle distance between the two points using the Haversine formula. We will use the Haversine formula to find the closest weather station to each airport.
+</p>
+<p style="font-family: times, serif; font-size:12pt">
+The two data frames delay_subset and airports were merged based on a common column IATA code. The merged data frame is then grouped by airport, and summary statistics are calculated for each airport, such as the total number of arriving flights, the number of cancelled flights, the number of delayed flights, and the total delay time. The longitude and latitude coordinates for each airport are also kept, as well as the name of the airport's region. The resulting data frame contains one row per airport, with columns for each of the calculated summary statistics.
+</p>
+<p style="font-family: times, serif; font-size:12pt">
+The resulting data frame is merged with the "met_subset" data frame to create a Cartesian product of the two data frames. Then, the distance is calculated between the airport and weather station locations using the Haversine formula. The resulting data frame is again grouped by the "airport" column and the row with the minimum distance is selected for each group.
+The final output data frame contains information on the airport, its closest weather station, delay statistics, and airport location information. This data set will hopefully provides valuable insights into the relationship between airport delays and weather patterns. Table 1 shows a subset of our dataset.
+</p>
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+closest_station = closest_station %>% mutate(pct_delay = arr_delayed/arr_flights,
+                           pct_cancel = arr_cancelled/arr_flights)
+```
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+kable(head(closest_station[, c("airport", "arr_delayed", "arr_cancelled","weather_prop", "region_name", "elev", "wind.sp", "vis.dist", "rh")]), digits = 3)
+```
+
+
+
+
+
+
+#### Data Exploration
+
+<p style="font-family: times, serif; font-size:12pt">
+Now let's explore our cleaned dataset.
+</p>
+
+```{r echo=FALSE, fig.cap="Distribution of Arrivel Flights Cancelled in the US in August 2019", fig.height=3, fig.width=4, message=FALSE, warning=FALSE}
+closest_station %>%
+  ggplot(mapping = aes(x=arr_cancelled)) +
+  theme_light() +
+  geom_histogram(binwidth = 50, fill = "lightblue", col = "lightgrey") +
+#  scale_fill_brewer(palette  = "GnBu") +
+  xlab("Arrivel Flights Cancelled") +
+  ylab("Count")
+```
+
+<p style="font-family: times, serif; font-size:12pt">
+Figure 1 shows the number of flights on the y-axis and the number of cancelled flights on the x-axis. The shape of the histogram is right skewed, indicating that most airports have less flights cancelled, while fewer airports have a large number of cancelled flight.
+</p>
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.cap="Distribution of Arrivel Flights Delayed in the US in August 2019", fig.height=3, fig.width=4}
+closest_station %>%
+  ggplot(mapping = aes(x=arr_delayed)) +
+  theme_light() +
+  geom_histogram(binwidth = 300, fill = "lightblue", col = "lightgrey") +
+#  scale_fill_brewer(palette  = "GnBu") +
+  xlab("Arrivel Flights Delayed") +
+  ylab("Count")
+```
+
+<p style="font-family: times, serif; font-size:12pt">
+Figure 2 shows the number of flights on the y-axis and the number of delayed flights on the x-axis. The shape of the histogram is right skewed, indicating that most airports experience less flight delays, while fewer airports have a large number of delayed flight.
+</p>
+
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.cap="Proportion of Weather Delays in the US in August 2019", fig.height=3, fig.width=4}
+closest_station %>%
+  ggplot(mapping = aes(x=weather_prop)) +
+  theme_light() +
+  geom_histogram(binwidth = 0.01, fill = "lightblue", col = "lightgrey") +
+#  scale_fill_brewer(palette  = "GnBu") +
+  xlab("Proportion of Weather Delays") +
+  ylab("Count")
+```
+<p style="font-family: times, serif; font-size:12pt">
+Figure 3 shows the number of flights on the y-axis and the number of delayed flights cause by weather on the x-axis. The shape of the histogram is right skewed, indicating that most airports experience less weather flight delays, while fewer airports have a large number of weather delayed flights.
+</p>
+
+#### Modeling
+<p style="font-family: times, serif; font-size:12pt">
+In order to find the relationship between different weather condition indicators and the proportion of flight delays, we will use linear model and random forest model. 
+We will fit linear regression models to the data, with the proportion of weather delayed flights as the response variable and the other variables as predictor variables. The linear regression models will provide estimates of the effects of each predictor variable on the proportion of weather delayed flights. We will also be traning a random forest model which will help us model the non-linear relationship if it exist.
+</p>
+
+
+## Results 
+
+#### Data Summary
+
+<p style="font-family: times, serif; font-size:12pt">
+Now we will summarize and group flight data by region, calculating the proportion of weather delayed flights and delayed flights for each region.
+</p>
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+kable(closest_station %>% na.omit() %>%
+  group_by(region_name) %>%
+  summarise(
+            weather_prop = mean(weather_prop),
+            wind_sp = mean(wind.sp),
+            vis.dist = mean(vis.dist)),
+  col.names = c('State', 'proportion of weather delayed flights', 'mean wind speed', 'mean visability distance'), caption = "Proportion of Weather Delayed Flights by State", digits = 3)
+
+```
+<p style="font-family: times, serif; font-size:12pt">
+The table above shows the mean proportion of delayed flights because of the weather for each state in the US. We see that the statistics significantly differs by state. For Alaska, the proportion of weather delayed flights was 0.132 and . This number is significantly lower for Arizona, which have a weather flight delay proportion of 0.011. In this table, we see that the proportion of wather delayed flights varies by geographic region.
+</p>
+
+#### Linear Model
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, fig.cap="Realationship between Wind Speed and Proportion of Weather Flight Delays", fig.height=3, fig.width=4}
+closest_station %>%
+  ggplot(mapping = aes(x = wind.sp, y = weather_prop, color = temp)) +
+  theme_classic() +
+  geom_point()+
+  geom_smooth(method = "lm", se = FALSE) +
+  xlab("Wind Speed") +
+  ylab("Proportion of Flight Delayed")
+```
+```{r, echo=FALSE, warning=FALSE, message=FALSE, results='asis'}
+options(xtable.comment = FALSE)
+model = lm(data = closest_station, weather_prop ~ wind.sp)
+xtable_model <- xtable(summary(model), caption = 'Realationship between Wind Speed and Proportion of Weather Flight Delays')
+
+# print the xtable object with formatting options
+print(xtable_model, type = "latex", 
+      booktabs = TRUE, 
+      label = "tab:regression", digits = c(0, 2, 2, 2, 3))
+```
+<p style="font-family: times, serif; font-size:12pt">
+Figure 4 shows the relationship between wind speed near the airport and proportion of flight delayed cause by weather in the airport. The horizontal axis (X-axis) represents the wind speed and the vertical axis (Y-axis) represents the proportion of flight delay, measured as a proportion from 0 to 1. The point are colored by temperature. Each point on the scatter plot represents a specific airport, with the wind speed and proportion of flight delay for that point plotted as a coordinate. We see a generally downward trend with the two variables. As wind speed increases, the proportion of flight delay decreases. There are no outliers or unusual observations.
+</p>
+
+<p style="font-family: times, serif; font-size:12pt">
+Table 3 is the summary for this linear model of wind speed near the airport and proportion of flight delayed. The intercept coefficient of 0.0913 represents the estimated value of y when wind speed is 0. 
+The coefficient for wind speed is -0.0094, indicating that for every unit increase in wind speed, the estimated value of y decreases by 0.0094. Therefore, there is a negative relationship between wind speed and proportion of weather delayed flights, meaning that as wind speed increases, the value of proportion of weather delayed flights tends to decrease.
+</p>
+
+
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.cap="Relationship between Visibility Distance and Proportion of Flight Delayed", fig.height=3, fig.width=4}
+closest_station %>%
+  ggplot(mapping = aes(x = vis.dist, y = weather_prop, color = temp)) +
+  theme_classic() +
+  geom_point()+
+  geom_smooth(method = "lm", se = FALSE) +
+  xlab("Visibility Distance") +
+  ylab("Proportion of Flight Delayed")
+```
+```{r, echo=FALSE, warning=FALSE, message=FALSE, results='asis'}
+model = lm(data = closest_station, weather_prop ~ vis.dist)
+xtable_model <- xtable(summary(model), caption = 'Realationship between Visibility Distance and Proportion of Weather Flight Delays')
+
+# print the xtable object with formatting options
+print(xtable_model, type = "latex", 
+      booktabs = TRUE, 
+      label = "tab:regression", digits = c(0, 2, 2, 2, 3))
+```
+<p style="font-family: times, serif; font-size:12pt">
+Figure 5 shows the relationship between visibility distance near the airport and proportion of flight delayed in the airport. The horizontal axis (X-axis) represents the visibility distance and the vertical axis (Y-axis) represents the proportion of flight delay.Each point on the scatter plot represents a specific airport. We see downward trend the two variables. As visibility distance increases, the proportion of flight delay decreases.
+</p>
+
+<p style="font-family: times, serif; font-size:12pt">
+Table 4 is the summary for the linear model of visibility distance near the airport and proportion of flight delayed. The intercept coefficient of 0.2570 represents the estimated value of y when visibility distance is 0. 
+The coefficient for visibility distance is really small, because of the huge difference in the values of visibility distance and proportion of delayed flights. However, looking at the P-value,  visibility distance is a good predictor for proportion of delayed flights. There is a negative relationship between visibility distance and proportion of weather delayed flights, meaning that as visibility distance increases, the value of proportion of weather delayed flights tends to decrease.
+</p>
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.cap="Relationship between Relative Humidity and Proportion of Flight Delayed", fig.height=3, fig.width=4}
+closest_station %>%
+  ggplot(mapping = aes(x = rh, y = weather_prop, color = temp)) +
+  theme_classic() +
+  geom_point()+
+  geom_smooth(method = "lm", se = FALSE) +
+  xlab("Visibility Distance") +
+  ylab("Proportion of Flight Delayed")
+```
+```{r, echo=FALSE, warning=FALSE, message=FALSE, results='asis'}
+model = lm(data = closest_station, weather_prop ~ rh)
+xtable_model <- xtable(summary(model), caption = 'Realationship between Relative Humidity and Proportion of Weather Flight Delays')
+
+# print the xtable object with formatting options
+print(xtable_model, type = "latex", 
+      booktabs = TRUE, 
+      label = "tab:regression", digits = c(0, 2, 2, 2, 3))
+```
+<p style="font-family: times, serif; font-size:12pt">
+Figure 6 shows the relationship between relative humidity near the airport and proportion of flight delayed in the airport. The horizontal axis (X-axis) represents the Relative Humidity and the vertical axis (Y-axis) represents the proportion of flight delay.Each point on the scatter plot represents a specific airport. We see an upward trend the two variables. As Relative Humidity increases, the proportion of flight delay also increases.
+</p>
+
+<p style="font-family: times, serif; font-size:12pt">
+Table 5 is the summary for the linear model of relative humidity near the airport and proportion of flight delayed. The intercept coefficient of 0.0913 represents the estimated value of y when wind speed is 0. 
+The coefficient for wind speed is -0.0094, indicating that for every unit increase in wind speed, the estimated value of y decreases by 0.0094. Therefore, there is a negative relationship between wind speed and proportion of weather delayed flights, meaning that as wind speed increases, the value of proportion of weather delayed flights tends to decrease.
+</p>
+
+
+#### Random Forest
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+library(rpart)
+library(rpart.plot)
+library(randomForest)
+```
+
+<p style="font-family: times, serif; font-size:12pt">
+This scatter plot shows the relationship between proportion of cancelled flight and proportion of delayed flight in the airport. The horizontal axis (X-axis) represents the proportion of cancelled flight and the vertical axis (Y-axis) represents the proportion of delayed flights, measured as a proportion from 0 to 1. We see a strong positive relationship between the 2 variables.
+</p>
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+closest_station <- na.omit(closest_station)
+rows <- sample(nrow(closest_station))
+split_point <- round(0.7 * length(rows))
+train <- closest_station[rows[1:split_point], ]
+test <- closest_station[rows[(split_point + 1):length(rows)], ]
+
+```
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.height=3, fig.width=4}
+forest <- randomForest(weather_prop ~ temp + elev + wind.sp + vis.dist + rh, 
+                             data = train, 
+                             # mtry = n_features,
+                             na.action = na.omit)
+
+```
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+varImpPlot(forest, main = "Variable importance plot (Random forest)")
+```
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+forest_pred <- predict(forest, test)
+```
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+kable(tibble(forest_pred, y = test$weather_prop) |>
+  summarise(
+    mse = sum((forest_pred - y)^2) / n(),
+    median_y = 0.048,
+    mean_y = 0.075
+  ) )
+```
+
+## Conclusion and Summary
+
+<p style="font-family: times, serif; font-size:12pt">
+In this report, we hope to answer the question "What factors contribute to flight delays caused by weather?".
+From our summary of the data, we found that the proportion of delayed flights cause by weather differs by geographic location. Using linear model we found that visibility distance and wind speed have a negative relationship with proportion of weather delays, whereas relative humidity have a positive relation ship with it. Next, we further investigate this relationship with random forest models, which can model non-linear relationship. With this model, we found that the top 3 factors contributing to the proportion of delayed flights are visibility distance, relative humidity and wind speed.
+</p>
+
+#### Limitations
+<p style="font-family: times, serif; font-size:12pt">
+There are several limitations to this project. First, the amount of data we are able to use is small. The flight delay data we have is summed for each day not every hour. Since weather conditions can change relatively fast, daily summaries might not be enough information. Another limitation is the model we used, although random forest is powerful for regression task, it's difficult to interpret. We weren't able to see in which direction each variable contributed to the result.
+</p>
+
+
+
+
+
+
