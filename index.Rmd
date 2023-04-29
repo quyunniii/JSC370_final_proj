@@ -29,7 +29,6 @@ Flight delays can have significant impacts on airlines, passengers, and airport 
 
 <p style="font-family: times, serif; font-size:14pt">
 We found that the proportion of delayed flights cause by weather differs by geographic location. Using linear model we found that visibility distance and wind speed have a negative relationship with proportion of weather delays, whereas relative humidity have a positive relation ship with it. We further investigate this relationship with random forest models, which can model non-linear relationship. With this model, we found that the top 3 factors contributing to the proportion of delayed flights are visibility distance, relative humidity and wind speed.
-
 </p>
 ```{r setup, message=FALSE, echo=FALSE, warning=FALSE}
 
