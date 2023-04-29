@@ -135,9 +135,9 @@ p5
 This map shows the proportion of weather delays of the airports in the US. Where blue indicates low proportion of delay and red indicates high proportion of delay. We can see that there are a higher proportion of delays in the coastal region and eastern part of US.
 </p>
 
-## Linear Models {.tabset}
+## Linear Models for Weather Flight Delays {.tabset}
 
-### Relationship between Visibility Distance and Flight Delays
+### Visibility Distance
 
 ```{r, echo=FALSE}
 p1
@@ -147,8 +147,7 @@ The x-axis represents visibility distance, and the y-axis represents the proport
 </p>
 
 
-### Relationship between Relative Humidity and Flight Delays
-
+### Relative Humidity
 ```{r, echo=FALSE}
 p2
 ```
@@ -157,7 +156,7 @@ p2
 The x-axis represents Relative Humidity, and the y-axis represents the number of proportion of weather delayed arrivals. Each point on the scatter plot represents a specific region, with the color of the point indicating the region, the size of the point indicating the wind. We fitted a regression line to the data points, which shows the overall trend of the data. This plot is interactive, so hovering over a data point displays a tooltip with detailed information about the region, including the Relative Humidity and the number of proportion of weather delayed arrivals.
 </p>
 
-### Relationship between Wind Speed and Flight Delays
+### Wind Speed
 
 ```{r, echo=FALSE}
 p3
